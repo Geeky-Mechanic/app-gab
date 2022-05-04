@@ -13,5 +13,9 @@
     "@sveltejs/kit": "next",
     "svelte": "^3.44.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "mongoose": "^6.3.1"
+  }
 }

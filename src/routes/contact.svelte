@@ -1,11 +1,16 @@
 <script>
 import Card from '$lib/Card.svelte';
-import Form from '$lib/Form.svelte';
+import Input from '$lib/Inputs.svelte';
 import Button from '$lib/Button.svelte';
+
 import { slide } from 'svelte/transition';
+import { writable } from 'svelte/store';
+
+/* --->  Form contents  <--- */
 
 let items = [
 {
+    id: 1,
     label:"Name", 
     type:"text", 
     name: "contact-name",
@@ -13,6 +18,7 @@ let items = [
 }, 
 
 {
+    id: 2,
     label:"Last Name", 
     type: "text", 
     name: "contact-lname",
@@ -20,6 +26,7 @@ let items = [
 }, 
 
 {
+    id: 3,
     label: "Email", 
     type:"email", 
     name: "contact-email",
@@ -27,6 +34,7 @@ let items = [
 },
 
 {
+    id: 4,
     label: "Subject", 
     type: "text", 
     name: "contact-subj",
@@ -34,6 +42,7 @@ let items = [
 }, 
 
 {
+    id: 5,
     label: "Describe your issue",
     type: "textarea", 
     cols:"60", 
@@ -43,8 +52,77 @@ let items = [
 },
 ];
 
-let style = "blue";
+/* --->  Input values handling  <--- */
+
+let data = {
+    name: "",
+    email: "",
+    lname: "",
+    subj: "",
+    desc: "",
+};
+
+/* --->  Field validation handling  <--- */
+
+let errors = {
+    name: false,
+    email: false,
+    lname: false,
+    subj: false,
+    desc: false,
+};
+
+let posting = false;
+let posted = false;
+let promise;
+
+const validateFields = () => {
+    if(data.name.length <= 1){
+        errors.name = true;
+    } else if (!data.email.includes("@") && !data.email.includes(".")){
+        errors.email = true;
+    } else if (data.lname.length <= 1) {
+        errors.lname = true;
+    } else if (data.subj.length <= 1) {
+        errors.subj = true;
+    } else if (data.desc.length <= 10) {
+        errors.desc = true;
+    }
+};
+
+/* --->  Event handlers  <--- */
+
+const handleClick =() => {
+    validateFields();
+    if(!errors.name && !errors.email && !errors.lname && !errors.subj && !errors.desc){
+    promise = postForm();
+    }else {
+        console.log("some errors are left");
+    }
+    console.log(data);
+    console.log(errors);
+};
+
+const postForm = async () => {
+        posting = true;
+        posted = false;
+        const res = await fetch('http://192.168.0.104:5000/api/contact', {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(data), 
+        });
+        if(res.ok){
+            return res;
+        }
+        else {
+            throw new Error('Could not POST');
+        }
+};
+
 </script>
+
 <div out:slide>
 <Card hoverable>
     <div class="contact-container">
@@ -53,10 +131,52 @@ let style = "blue";
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab sint consequuntur velit qui nostrum atque placeat perferendis numquam beatae, sed magni omnis et vitae dolorum, ipsa quis voluptate similique explicabo?</p>
         </div>
         <div class="secondary-container">
-        <Form {items} {style} content="SEND" secondary />
-        <img src="https://firebasestorage.googleapis.com/v0/b/charger-project.appspot.com/o/question.png?alt=media&token=21067d71-ae51-4924-9246-09032c0cd60c"
-        alt="thinking" />
+            <div class="form-container">
+                <div class="form-element">
+                    <label for="1">Name</label>
+                    <input type="text" name="name" id="1" placeholder="John" bind:value={data.name} />
+                    {#if errors.name}
+                        <p class="errorMsg">Name is missing</p>
+                    {/if}
+                </div>
+                <div class="form-element">
+                    <label for="2">Last Name</label>
+                    <input type="text" name="lname" id="2" placeholder="Doe" bind:value={data.lname} />
+                    {#if errors.lname}
+                        <p class="errorMsg">Last Name is missing</p>
+                    {/if}
+                </div>
+                <div class="form-element">
+                    <label for="3">Email</label>
+                    <input type="email" name="email" id="3" placeholder="johndoe@gmail.com" bind:value={data.email} />
+                    {#if errors.email}
+                        <p class="errorMsg">Email is incorrect or missing</p>
+                    {/if}
+                </div>
+                <div class="form-element">
+                    <label for="4">Subject</label>
+                    <input type="text" name="subj" id="4" placeholder="What's this issue about?" bind:value={data.subj} >
+                    {#if errors.subj}
+                        <p class="errorMsg">Subject is missing</p>
+                    {/if}
+                </div>
+                <div class="form-element">
+                    <label for="5">Description</label>
+                    <textarea name="desc" id="5" rows="10" cols="60" placeholder="Describe as thouroughly and precisely as possible" bind:value={data.desc} />
+                    {#if errors.desc}
+                        <p class="errorMsg">Description is missing</p>
+                    {/if}
+                </div> 
+                <Button on:click={handleClick} content="SEND" secondary />
+            </div>
+            <img src="https://firebasestorage.googleapis.com/v0/b/charger-project.appspot.com/o/question.png?alt=media&token=21067d71-ae51-4924-9246-09032c0cd60c"
+            alt="thinking" />
         </div>
+        {#await promise}
+            <p class="promise">Sending your inquiry</p>
+        {:then res }
+            <p class="promise">Sent, thank you for choosing us!</p>            
+        {/await}
     </div>
 </Card>
 </div>
@@ -70,12 +190,39 @@ let style = "blue";
 
 .secondary-container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: left;
+    flex-direction: column;
+    margin-right: 200px;
 }
 
 img { 
     width: 30%;
     height: 30%;
 }
+
+label {
+    font-size: 1.2rem;
+    color: #6B6969;
+    margin: 0.5rem 0;
+}
+
+input {
+    margin: 0.5rem 0;
+    padding: 0.6rem 0.4rem;
+    width: 100%;
+}
+
+textarea {
+    margin: 0.5rem 0;
+    padding: 0.6rem 0.4rem;
+    width: 100%;
+}
+
 </style>

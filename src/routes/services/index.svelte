@@ -3,7 +3,7 @@ import Card from '$lib/Card.svelte';
 import Form from '$lib/Form.svelte';
 import Button from '$lib/Button.svelte';
 
-import { goto } from '$app/navigation';
+import { goto, prefetch } from '$app/navigation';
 import { slide } from 'svelte/transition';
 
 const days = ["1", "2", "3", "4", "5", "6", "7", "8"];
@@ -71,6 +71,11 @@ const handleNavigate = () => {
     goto("/services/booking");
 };
 
+const handleHover = () => {
+    prefetch("/services/booking")
+    .then(() => console.log("fetched")).catch((err) => console.log(err));
+};
+
 </script>
 
 <div out:slide>
@@ -84,7 +89,7 @@ const handleNavigate = () => {
         </p>
     </div>
     <Card hoverable colored small>
-        <div class="services-links">
+        <div class="services-links" on:mouseenter={handleHover}>
             <p>Place your reservation NOW!</p>
             <img src="https://firebasestorage.googleapis.com/v0/b/charger-project.appspot.com/o/calendar_add_on_FILL0_wght400_GRAD0_opsz48.svg?alt=media&token=efc2ac91-33ed-46e8-ad94-683e7e6201ba"
             alt="agenda">
