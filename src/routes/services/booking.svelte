@@ -21,17 +21,31 @@ export async function load({ fetch }) {
 
 <script>
 import { slide } from 'svelte/transition';
+import { InlineCalendar, Datepicker } from 'svelte-calendar';
+import dayjs from 'dayjs';
 export let data;
-console.log(data);
+let store;
+const today = new Date();
+
+const freeHours = () => {
+    let booked = data?.hours;
+    
+};
+
 </script>
 
-<div class="booking" out:slide>
-    {#each data as post}
-    <p>{post.title}</p>
-    {/each}
+<div class="booking-container" out:slide>
+    <Datepicker start={today} bind:store />
+    {dayjs($store?.selected).format('MM/DD/YYYY')}
 </div>
 
 
 <style>
+.booking-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 </style>

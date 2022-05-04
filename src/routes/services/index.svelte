@@ -1,6 +1,5 @@
 <script>
 import Card from '$lib/Card.svelte';
-import Form from '$lib/Form.svelte';
 import Button from '$lib/Button.svelte';
 
 import { goto, prefetch } from '$app/navigation';

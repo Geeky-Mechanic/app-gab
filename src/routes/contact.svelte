@@ -74,18 +74,28 @@ let errors = {
 
 let posting = false;
 let posted = false;
+let failed = false;
 let promise;
 
 const validateFields = () => {
+    errors.name = false;
+    errors.email = false;
+    errors.lname = false;
+    errors.subj = false;
+    errors.desc = false;
     if(data.name.length <= 1){
         errors.name = true;
-    } else if (!data.email.includes("@") && !data.email.includes(".")){
+    }
+    if (!data.email.includes("@") && !data.email.includes(".")){
         errors.email = true;
-    } else if (data.lname.length <= 1) {
+    }
+    if (data.lname.length <= 1) {
         errors.lname = true;
-    } else if (data.subj.length <= 1) {
+    }
+    if (data.subj.length <= 1) {
         errors.subj = true;
-    } else if (data.desc.length <= 10) {
+    }
+    if (data.desc.length <= 10) {
         errors.desc = true;
     }
 };
@@ -94,18 +104,22 @@ const validateFields = () => {
 
 const handleClick =() => {
     validateFields();
-    if(!errors.name && !errors.email && !errors.lname && !errors.subj && !errors.desc){
-    promise = postForm();
-    }else {
+    if(errors.name || errors.email || errors.lname || errors.subj || errors.desc){
         console.log("some errors are left");
+        posting = false;
+        posted = false;
+        failed = true;
+    }else {
+        postForm();
+        posting = true;
+        posted = false;
+        failed = false;
     }
     console.log(data);
     console.log(errors);
 };
 
 const postForm = async () => {
-        posting = true;
-        posted = false;
         const res = await fetch('http://192.168.0.104:5000/api/contact', {
             headers: {
                 'Content-Type': 'application/json'
@@ -114,9 +128,15 @@ const postForm = async () => {
             body: JSON.stringify(data), 
         });
         if(res.ok){
+            posting = false;
+            posted = true;
+            failed = false;
             return res;
         }
         else {
+            posting = false;
+            posted = false;
+            failed = true;
             throw new Error('Could not POST');
         }
 };
@@ -172,11 +192,13 @@ const postForm = async () => {
             <img src="https://firebasestorage.googleapis.com/v0/b/charger-project.appspot.com/o/question.png?alt=media&token=21067d71-ae51-4924-9246-09032c0cd60c"
             alt="thinking" />
         </div>
-        {#await promise}
-            <p class="promise">Sending your inquiry</p>
-        {:then res }
-            <p class="promise">Sent, thank you for choosing us!</p>            
-        {/await}
+        {#if posting}
+            <p class="promise-pending">Sending your inquiry</p>
+        {:else if posted }
+            <p class="promise-confirmed">Sent, thank you for choosing us!</p>
+        {:else if failed}
+            <p class="promise-failed">Posting has failed, please validate the form fields</p>            
+        {/if}
     </div>
 </Card>
 </div>
@@ -223,6 +245,22 @@ textarea {
     margin: 0.5rem 0;
     padding: 0.6rem 0.4rem;
     width: 100%;
+}
+
+.errorMsg {
+    color: red;
+}
+
+.promise-pending {
+    color: blue;
+}
+
+.promise-confirmed {
+    color: green;
+}
+
+.promise-failed {
+    color: red;
 }
 
 </style>
