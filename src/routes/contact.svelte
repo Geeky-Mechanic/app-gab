@@ -120,7 +120,7 @@ const handleClick =() => {
 };
 
 const postForm = async () => {
-        const res = await fetch('http://192.168.0.104:5000/api/contact', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}contact`, {
             headers: {
                 'Content-Type': 'application/json'
             },
