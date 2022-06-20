@@ -5,6 +5,7 @@ const bookStore = writable(
     posting : false,
     posted : false,
     failed : false,
+    response : null,
     }
     );
 
