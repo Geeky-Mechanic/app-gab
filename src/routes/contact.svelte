@@ -1,56 +1,8 @@
 <script>
     import Card from "$lib/Card.svelte";
-    import Input from "$lib/Inputs.svelte";
     import Button from "$lib/Button.svelte";
 
     import { slide } from "svelte/transition";
-    import { writable } from "svelte/store";
-
-    /* --->  Form contents  <--- */
-
-    let items = [
-        {
-            id: 1,
-            label: "Name",
-            type: "text",
-            name: "contact-name",
-            placeholder: "John",
-        },
-
-        {
-            id: 2,
-            label: "Last Name",
-            type: "text",
-            name: "contact-lname",
-            placeholder: "Doe",
-        },
-
-        {
-            id: 3,
-            label: "Email",
-            type: "email",
-            name: "contact-email",
-            placeholder: "johndoe@gmail.com",
-        },
-
-        {
-            id: 4,
-            label: "Subject",
-            type: "text",
-            name: "contact-subj",
-            placeholder: "What's this issue about?",
-        },
-
-        {
-            id: 5,
-            label: "Describe your issue",
-            type: "textarea",
-            cols: "60",
-            rows: "10",
-            name: "contact-desc",
-            placeholder: "Describe as thouroughly and precisely as possible",
-        },
-    ];
 
     /* --->  Input values handling  <--- */
 
@@ -75,7 +27,6 @@
     let posting = false;
     let posted = false;
     let failed = false;
-    let promise;
 
     const validateFields = () => {
         errors.name = false;
@@ -111,7 +62,6 @@
             errors.subj ||
             errors.desc
         ) {
-            console.log("some errors are left");
             posting = false;
             posted = false;
             failed = true;
@@ -121,12 +71,10 @@
             posted = false;
             failed = false;
         }
-        console.log(data);
-        console.log(errors);
     };
 
     const postForm = async () => {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}contact`, {
+        const res = await fetch(`/api/contact`, {
             headers: {
                 "Content-Type": "application/json",
             },
@@ -244,7 +192,7 @@
                 </p>
             {:else if failed}
                 <p class="promise-failed">
-                    Posting has failed, please validate the form fields
+                    Posting has failed, please refresh and try again!
                 </p>
             {/if}
         </div>

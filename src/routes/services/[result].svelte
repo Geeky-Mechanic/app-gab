@@ -26,7 +26,7 @@
     let month;
     let year;
 
-    async function getAppointement() {
+    function getAppointement() {
         const begHour = $bookStore.response?.begHour;
         const begDate = new Date(JSON.parse(begHour));
         hour = begDate.getHours();

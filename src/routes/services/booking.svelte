@@ -1,6 +1,6 @@
 <script context="module">
     export async function load({ fetch }) {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}book/hours`);
+        const res = await fetch(`/api/booking/hours`);
         const data = await res.json();
         if (res.ok) {
             return {
@@ -56,8 +56,8 @@
     const between = (newBook) => {
         const bookingDate = new Date(newBook).getTime();
         return data.some((obj) => {
-            const begDate = new Date(obj).getTime();//165348
-            const end = new Date(obj);
+            const begDate = new Date(obj.begHour).getTime();//165348
+            const end = new Date(obj.begHour);
             const endHour = end;
             endHour.setHours(end.getHours() + 2);
             const endDate = endHour.getTime();
@@ -70,7 +70,7 @@
     const tooEarly = (newBook) => {
         const bookingDate = new Date(newBook);
 
-        return bookingDate.getHours() < (8 || today.getHours());
+        return bookingDate.getHours() < 8 || bookingDate.getHours() < today.getHours();
     };
 
     /* --->  Verify if selected date is after opening hours  <--- */
@@ -178,7 +178,7 @@
 
     const postRequest = async (newBooking) => {
         if (!errors.between && !errors.tooEarly && !errors.tooLate) {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}book`, {
+            const res = await fetch(`/api/booking`, {
                 headers: {
                     "Content-Type": "application/json",
                 },
