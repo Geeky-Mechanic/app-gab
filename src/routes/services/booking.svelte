@@ -70,7 +70,7 @@
     const tooEarly = (newBook) => {
         const bookingDate = new Date(newBook);
 
-        return bookingDate.getHours() < 8 || bookingDate.getHours() < today.getHours();
+        return bookingDate.getHours() < 8 || (bookingDate.getDate() === today.getDate() && bookingDate.getHours() < today.getHours());
     };
 
     /* --->  Verify if selected date is after opening hours  <--- */
