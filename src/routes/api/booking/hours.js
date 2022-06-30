@@ -24,7 +24,7 @@ export async function get(event){
         console.log(err);
         return {
             body: err,
-            status: 400,
+            status: 500,
         };
     }
 }
